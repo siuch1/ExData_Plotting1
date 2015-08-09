@@ -1,0 +1,27 @@
+rm(list=ls())
+
+## Download and unzip file to data0
+fileUrl <- "https://d396qusza40orc.cloudfront.net/exdata%2Fdata%2Fhousehold_power_consumption.zip"
+temp <- tempfile()
+download.file(fileUrl,temp)
+data0 <- read.table(unz(temp, "household_power_consumption.txt"), sep=";", header=TRUE, stringsAsFactors=FALSE)
+unlink(temp)
+
+## Processing data0
+d0 <- subset(data0, Date=="1/2/2007" | Date=="2/2/2007")
+d0$Global_active_power <- as.numeric(d0$Global_active_power)
+d0$Date <- as.Date(as.character(d0$Date),"%d/%m/%Y")
+d0$sDateTime <- paste(d0$Date, d0$Time, sep= " ")
+d0$DateTime <- strptime(d0$sDateTime, "%Y-%m-%d %H:%M:%S")
+d0$Sub_metering_1 <- as.numeric(d0$Sub_metering_1)
+d0$Sub_metering_2 <- as.numeric(d0$Sub_metering_2)
+d0$Sub_metering_3 <- as.numeric(d0$Sub_metering_3)
+
+## Plot 3
+par(mfcol=c(1,1))
+plot(d0$DateTime,d0$Sub_metering_1,type="l",col="black", xlab="", ylab="Energy submetering")
+lines(d0$DateTime,d0$Sub_metering_2,type="l",col="red")
+lines(d0$DateTime,d0$Sub_metering_3,type="l",col="blue")
+legend("topright", pch=1, col=c("black","red","blue"), legend=c("Sub_metering_1","Sub_metering_2", "Sub_metering_3"))
+dev.copy(png, file="plot3.png")
+dev.off()
